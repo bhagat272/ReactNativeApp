@@ -51,6 +51,7 @@ const ComponentScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false} // Hides the vertical scroll bar
       />
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total Order Price: ${getTotalPrice()}</Text>
