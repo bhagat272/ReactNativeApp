@@ -1,49 +1,87 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Provider as PaperProvider, Appbar, Avatar, List, Card, Divider, Text, IconButton } from 'react-native-paper';
 
 const SettingsScreen = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
-      <TouchableOpacity style={styles.option}>
-        <Text style={styles.optionText}>Profile Update</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.option}>
-        <Text style={styles.optionText}>About</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.option}>
-        <Text style={styles.optionText}>Help</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.option}>
-        <Text style={styles.optionText}>Log Out</Text>
-      </TouchableOpacity>
-    </View>
-  )
-}
-
-export default SettingsScreen
+    <PaperProvider>
+      <View style={{ flex: 1 }}>
+        <Appbar.Header>
+          <Appbar.Content title="Settings" />
+        </Appbar.Header>
+        <View style={styles.container}>
+          <View style={styles.profileSection}>
+            <Avatar.Image size={80} source={{ uri: 'https://example.com/avatar.jpg' }} />
+            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileEmail}>john.doe@example.com</Text>
+            <IconButton
+              icon="pencil"
+              size={20}
+              onPress={() => console.log('Edit Profile')}
+              style={styles.editProfileButton}
+            />
+          </View>
+          <Card style={styles.card}>
+            <List.Section>
+              <List.Item
+                title="Profile Update"
+                left={(props) => <List.Icon {...props} icon="account" />}
+                onPress={() => console.log('Profile Update')}
+              />
+              <Divider />
+              <List.Item
+                title="About"
+                left={(props) => <List.Icon {...props} icon="information" />}
+                onPress={() => console.log('About')}
+              />
+              <Divider />
+              <List.Item
+                title="Help"
+                left={(props) => <List.Icon {...props} icon="help" />}
+                onPress={() => console.log('Help')}
+              />
+              <Divider />
+              <List.Item
+                title="Log Out"
+                left={(props) => <List.Icon {...props} icon="logout" />}
+                onPress={() => console.log('Log Out')}
+              />
+            </List.Section>
+          </Card>
+        </View>
+      </View>
+    </PaperProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  option: {
-    backgroundColor: '#f0f0f0',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 8,
+  profileSection: {
     alignItems: 'center',
+    marginBottom: 20,
   },
-  optionText: {
-    fontSize: 18,
-    color: '#333',
+  profileName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 1,
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  editProfileButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  card: {
+    padding: 16,
+    borderRadius: 8,
   },
 });
+
+export default SettingsScreen;

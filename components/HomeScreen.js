@@ -1,51 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, Animated, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, FlatList, TouchableOpacity, ImageBackground, StyleSheet, Animated, Text, Button } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProducts } from '../redux/slices/productsSlice';
+import { addToCart } from '../redux/slices/cartSlice';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons'; // Make sure to install @expo/vector-icons
 
 const HomeScreen = () => {
-  const [products, setProducts] = useState([]);
-  const [pressedIndex, setPressedIndex] = useState(null);
+  const products = useSelector((state) => state.products.items);
+  const status = useSelector((state) => state.products.status);
+  const dispatch = useDispatch();
   const animations = useRef([]);
+  const flatListRef = useRef();
+  const navigation = useNavigation();
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch('https://fakestoreapi.com/products');
-      const data = await response.json();
-      setProducts(data);
-
-      // Initialize animations
-      animations.current = data.map(() => new Animated.Value(-500));
-
-      // Start animations
-      data.forEach((_, index) => {
-        Animated.timing(animations.current[index], {
-          toValue: 0,
-          duration: 500,
-          delay: index * 100,
-          useNativeDriver: true,
-        }).start();
-      });
-    } catch (error) {
-      console.error(error);
+    if (status === 'idle') {
+      dispatch(fetchProducts());
     }
-  };
+  }, [status, dispatch]);
+
+  useEffect(() => {
+    animations.current = products.map(() => new Animated.Value(-500));
+    products.forEach((_, index) => {
+      Animated.timing(animations.current[index], {
+        toValue: 0,
+        duration: 500,
+        delay: index * 100,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [products]);
 
   const renderItem = ({ item, index }) => {
     const animatedStyle = {
       transform: [{ translateX: animations.current[index] || new Animated.Value(0) }],
     };
-
-    const isPressed = index === pressedIndex;
-
     return (
-      <Animated.View style={[styles.productContainer, animatedStyle, isPressed && styles.pressedProductContainer]}>
+      <Animated.View style={[styles.productContainer, animatedStyle]} key={item.id}>
         <TouchableOpacity
           activeOpacity={1}
-          onPressIn={() => setPressedIndex(index)}
-          onPressOut={() => setPressedIndex(null)}
+          onPress={() => navigation.navigate('ProductDetails', { product: item })}
         >
           <ImageBackground
             source={{ uri: item.image }}
@@ -58,18 +53,30 @@ const HomeScreen = () => {
             </View>
           </ImageBackground>
         </TouchableOpacity>
+        <Button 
+          title="Add to Cart" 
+          onPress={() => dispatch(addToCart(item))} 
+        />
       </Animated.View>
     );
+  };
+
+  const handleScrollToTop = () => {
+    flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
   };
 
   return (
     <View style={styles.container}>
       <FlatList
+        ref={flatListRef}
         data={products}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
       />
+      <TouchableOpacity style={styles.scrollTopButton} onPress={handleScrollToTop}>
+        <MaterialIcons name="arrow-upward" size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -90,20 +97,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    transition: 'all 0.3s',
-  },
-  pressedProductContainer: {
-    shadowOpacity: 0.3,
-    elevation: 8,
+    padding: 16,
   },
   backgroundImage: {
-    padding: 16,
     borderRadius: 8,
-    height: 200, // Adjust the height as needed
-    justifyContent: 'flex-end', // Align text at the bottom
+    height: 200,
+    justifyContent: 'flex-end',
   },
   textContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 8,
     padding: 8,
   },
@@ -115,5 +117,21 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 14,
     color: '#fff',
+  },
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#ff6347',
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
