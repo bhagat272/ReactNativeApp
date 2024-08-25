@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, increaseQuantity, decreaseQuantity } from '../redux/slices/cartSlice';
+import { removeFromCart, increaseQuantity, decreaseQuantity, clearCart } from '../redux/slices/cartSlice';
 
-const ComponentScreen = () => {
+const ComponentScreen = ({ navigation }) => {
   const cartItems = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
-      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      <Image source={{ uri: item.images[0] }} style={styles.itemImage} />
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.title}</Text>
         <Text style={styles.itemPrice}>${item.price.toFixed(2)} x {item.quantity}</Text>
@@ -43,6 +43,21 @@ const ComponentScreen = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
 
+  const handleClearCart = () => {
+    Alert.alert(
+      "Clear Cart",
+      "Are you sure you want to clear the cart?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "OK", onPress: () => dispatch(clearCart()) }
+      ]
+    );
+  };
+
+  const handlePayment = () => {
+    navigation.navigate('PaymentScreen');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Cart</Text>
@@ -51,16 +66,26 @@ const ComponentScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false} // Hides the vertical scroll bar
+        showsVerticalScrollIndicator={false}
       />
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total Order Price: ${getTotalPrice()}</Text>
+        <TouchableOpacity 
+          style={styles.paymentButton}
+          onPress={handlePayment}
+        >
+          <Text style={styles.paymentButtonText}>Proceed to Payment</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.clearCartButton}
+          onPress={handleClearCart}
+        >
+          <Text style={styles.clearCartButtonText}>Clear Cart</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
-}
-
-export default ComponentScreen;
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -71,8 +96,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 16,
   },
   list: {
     flexGrow: 1,
@@ -80,24 +104,19 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    marginVertical: 8,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 8,
   },
   itemImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 80,
+    height: 80,
+    resizeMode: 'cover',
+    marginRight: 16,
   },
   itemDetails: {
     flex: 1,
-    marginLeft: 16,
   },
   itemName: {
     fontSize: 18,
@@ -105,56 +124,70 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontSize: 16,
-    color: 'gray',
+    color: '#666',
   },
   totalItemPrice: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginVertical: 8,
   },
   buttonGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
   },
   quantityButton: {
-    backgroundColor: '#ff6347',
+    backgroundColor: '#ddd',
     padding: 8,
-    borderRadius: 8,
-    marginHorizontal: 5,
+    borderRadius: 4,
+    marginHorizontal: 4,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
   },
   quantityText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
   },
   removeButton: {
     backgroundColor: '#ff6347',
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   removeButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 16,
   },
   totalContainer: {
-    marginTop: 20,
-    padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    paddingBottom: 16,
   },
   totalText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+    marginBottom: 16,
+  },
+  paymentButton: {
+    backgroundColor: '#28a745',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  paymentButtonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  clearCartButton: {
+    backgroundColor: '#dc3545',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  clearCartButtonText: {
+    color: '#fff',
+    fontSize: 18,
   },
 });
+
+export default ComponentScreen;

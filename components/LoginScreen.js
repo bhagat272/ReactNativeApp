@@ -1,14 +1,28 @@
-// components/LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Add your login logic here
-    // If successful, setIsAuthenticated(true);
+  const handleLogin = async () => {
+    setLoading(true); // Show loading indicator
+    try {
+      // Add your login logic here
+      // Simulate a delay for demonstration purposes
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Simulate successful login
+      console.log('Login successful');
+      Alert.alert('Success', 'You have logged in successfully.');
+      // Navigate to a different screen or set authenticated state
+      // navigation.navigate('Home');
+    } catch (error) {
+      console.error('Login failed:', error);
+      Alert.alert('Login failed', 'Please check your email and password.');
+    } finally {
+      setLoading(false); // Hide loading indicator
+    }
   };
 
   return (
@@ -19,6 +33,9 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCompleteType="email"
       />
       <TextInput
         style={styles.input}
@@ -27,8 +44,18 @@ const LoginScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Register" onPress={() => navigation.navigate('Registration')} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#007BFF" />
+      ) : (
+        <>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Registration')}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 };
@@ -40,18 +67,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
-    gap:3
+    backgroundColor: '#F5F5F5',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
     marginBottom: 20,
     textAlign: 'center',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    height: 50,
+    borderColor: '#DDDDDD',
     borderWidth: 1,
-    marginBottom: 20,
-    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    backgroundColor: '#FFFFFF',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

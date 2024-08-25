@@ -7,8 +7,8 @@
     "icon": "./assets/shop.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/shop1.png",
-      "resizeMode": "contain",
+      "image": "./assets/shop.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "ios": {
@@ -18,10 +18,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bhagat15.myapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "352daf60-b3cf-4adb-8d93-7d3f1615b160"
+      }
     }
   }
 }
